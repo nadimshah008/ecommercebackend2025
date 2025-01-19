@@ -3,7 +3,7 @@ const env = process.env.NODE_ENV;
 const config = {
   local: {
     port: 3000,
-    apiUrl: "http://localhost:4000/",
+    apiUrl: "http://65.0.107.93:3000/",
     db: {
       username: "",
       password: "",
