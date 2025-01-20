@@ -78,7 +78,9 @@ function loginAdmin(req, res) {
     try {
       if (req.body && req.body.email) {
         let condition = { email: req.body.email };
-        let fetchUser = await common.findOne(users, condition);
+        let fetchUser = await common.findOne(users, {
+          email:req.body.email
+        });
         if(fetchUser[0].role!==0){
           res.json({message:"Only Admins Can Login", status:400});
         }
