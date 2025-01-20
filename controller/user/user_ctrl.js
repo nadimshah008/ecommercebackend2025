@@ -11,10 +11,41 @@ module.exports = {
   addUser: addUser,
   updateUser: updateUser,
   loginUser: loginUser,
+  addAdmin:addAdmin,
+  loginAdmin:loginAdmin
 };
 
+
+function addAdmin(req,res){
+  async function addAdmin(){
+    try {
+      if (req.body && req.body.email) {
+        const salt = await bcrypt.genSalt(saltRounds);
+        const hashedPassword = await bcrypt.hash(req.body.password, salt);
+        let saveUser = new users({
+          name:req.body.name,
+          email: req.body.email,
+          phone: req.body.phone|| null,
+          password: hashedPassword, 
+          isActive:true,
+          role:0
+        });
+        let saveUserData = await common.insertOne(users, saveUser);
+        if (!saveUserData) {
+          res.json({ message: "Failed to add the data" ,status:400});
+        } else {
+          res.json({ data: saveUserData, status:200, message:"Admin Registered Successfully" });
+        }
+      }
+    } catch (error) {
+      res.json({ message: error,status:500 });
+    }
+  }
+  addAdmin().then(function(){})
+}
+
 function loginUser(req, res) {
-  async function loginUser() {
+  async function loginUser() { 
     try {
       if (req.body && req.body.email) {
         let condition = { email: req.body.email };
@@ -40,6 +71,38 @@ function loginUser(req, res) {
     }
   }
   loginUser().then(function () {});
+}
+
+function loginAdmin(req, res) {
+  async function loginAdmin() {
+    try {
+      if (req.body && req.body.email) {
+        let condition = { email: req.body.email };
+        let fetchUser = await common.findOne(users, condition);
+        if(fetchUser[0].role!==0){
+          res.json({message:"Only Admins Can Login", status:400});
+        }
+        if (!fetchUser.length) {
+          res.json({ message: "No user found" ,status:400});
+        } else {
+          let password = fetchUser[0].password;
+          const passwordMatch = await bcrypt.compare(
+            req.body.password,
+            password
+          );
+          if (passwordMatch) {
+            const token = jwt.sign({email:req.body.email},'hotelDBManagement',{expiresIn:'1m'})
+            res.json({ message: "Admin is valid, Logged in successfully" ,"token":token,status:200});
+          } else {
+            res.json({ message: "Password does not match",status:400 });
+          }
+        }
+      }
+    } catch (error) {
+      res.json({ message: error, status:500 });
+    }
+  }
+  loginAdmin().then(function () {});
 }
 
 function getUser(req, res) {
@@ -72,12 +135,14 @@ function addUser(req, res) {
           email: req.body.email,
           phone: req.body.phone,
           password: hashedPassword,
+          isActive:true,
+          role:1
         });
         let saveUserData = await common.insertOne(users, saveUser);
         if (!saveUserData) {
           res.json({ message: "Failed to add the data" ,status:400});
         } else {
-          res.json({ data: saveUserData, status:200 });
+          res.json({ data: saveUserData, status:200, message:"User Registered Successfully" });
         }
       }
     } catch (error) {

@@ -39,6 +39,31 @@ var productSchema = mongoose.Schema(
         required: true,
         //  enum: ['Men', 'Women', 'Kids', 'Unisex', 'Accessories'], // Add categories as needed
       },
+    bagsize:{
+      type: [String],
+      required: true,
+    },
+    salespackage:{
+      type:String
+    },
+    slots:{
+      type:String
+    },
+    material:{
+      type:String
+    },
+    width:{
+      type:String
+    },
+    height:{
+      type:String
+    },
+    warranty:{
+      type:String
+    },
+    returnpolicy:{
+      type:String
+    },
     size: {
       type: [String],
       required: true,

@@ -3,7 +3,7 @@ module.exports = function (router) {
   router.get("/products", admin.getProducts);
   router.post("/product", admin.addProduct);
   router.put("/delete", admin.deleteProduct);
-  router.get("/product", admin.getProduct);
+  router.post("/productdetails", admin.getProduct);
   router.post("/category", admin.addCategory);
   router.post("/subcategory", admin.addsubcategory);
   router.get("/categories", admin.getCategories);

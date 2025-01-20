@@ -57,11 +57,11 @@ common.findOne = async function findOne(collection, condition) {
       .find(condition)
       .exec()
       .then((data) => {
-        resolve(data);
+          resolve(data);
       })
       .catch((error) => {
         reject(error);
-      });
+      }); 
   });
 };
 

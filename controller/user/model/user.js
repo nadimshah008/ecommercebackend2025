@@ -13,6 +13,14 @@ var userSchema = mongoose.Schema(
     password:{
       type:String,
       default:null
+    },
+    isActive:{
+      type:Boolean,
+      default:true
+    },
+    role:{
+      type:Number,
+      default:null
     }
   },
   {

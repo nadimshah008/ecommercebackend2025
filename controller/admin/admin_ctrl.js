@@ -23,7 +23,7 @@ module.exports = {
   deleteCategory: deleteCategory,
   deleteSubCategory:deleteSubCategory,
   getSubCategoryOnCategory:getSubCategoryOnCategory,
-  uploadImage:uploadImage
+  uploadImage:uploadImage,
 };
 
 function uploadImage(){
@@ -90,7 +90,7 @@ function addCategory(req, res) {
         res.json({ message: "Failed to add the category", status: 400 });
       } else {
         res.json({
-          data: saveCategoryData,
+          data: saveCategoryData, 
           status: 200,
           message: "Category Added",
         });
@@ -261,7 +261,7 @@ function addsubcategory(req, res) {
 function getProducts(req, res) {
   async function getProducts() {
     try {
-      if (req.body) {
+      if (req.body) { 
         let productsData = await common.findAll(products,{});
         if(!productsData){
             res.json({message:'No Products ',status:400})
@@ -308,7 +308,7 @@ function getSubCategoryOnCategory(req,res){
 
 function addProduct(req, res) {
   async function addProduct() {
-    try {
+    try { 
       if (!req.body.name || !req.body.price || !req.body.category) {
         res.json({ message: "Required fileds are missing", status: 400 });
       }
@@ -332,6 +332,14 @@ function addProduct(req, res) {
           count: req.body.ratings?.count || 0,
         },
         tags: req.body.tags || [],
+        bagsize: req.body.bagsize || [],
+        salespackage: req.body.salespackage || "",
+        slots: req.body.slots || "",
+        material: req.body.material || "",
+        width: req.body.width || "",
+        height: req.body.height || "",
+        warranty: req.body.warranty || "",
+        returnpolicy: req.body.returnpolicy || "",
       });
       let saveProductData = await common.insertOne(products, saveProduct);
       if (!saveProductData) {
@@ -349,9 +357,28 @@ function addProduct(req, res) {
 function deleteProduct(req, res) {}
 
 function getProduct(req, res) {
+    async function getProduct(){
+      try {
+        if (req.body && req.body.id) {
+          let condition = { _id: req.body.id };
+          let productData = await common.findOne(products,{
+            _id:req.body.id
+          });  
+          if (!productData) {
+            return res.status(404).json({ message: "No product found", status: 400, data: null });
+          }  
+          return res.status(200).json({ message: "Product Fetched", status: 200, data: productData });
+        } else {
+          return res.status(400).json({ message: "Invalid request body", status: 400 });
+        }
+      } catch (error) {
+        if (!res.headersSent) {
+          return res.status(500).json({ message: error.message, status: 500 });
+        }
+        console.error("Error after response was sent:", error);
+      }
 
-    
-
-
+    }
+    getProduct().then(function(){})
 
 }

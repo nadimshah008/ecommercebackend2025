@@ -4,5 +4,7 @@ module.exports = function (router) {
   router.post("/signup", user.addUser);
   router.put("/user", user.updateUser);
   router.post('/login',user.loginUser)
+  router.post('/registeradmin', user.addAdmin);
+  router.post('/loginadmin',user.loginAdmin);
   return router;
 };
