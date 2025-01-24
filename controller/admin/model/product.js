@@ -14,6 +14,9 @@ var productSchema = mongoose.Schema(
         type:Boolean,
         default:true,
     },
+    sku:{
+      type:String
+    },
     variants: {
       type: [mongoose.Schema.Types.ObjectId],
       ref: "products", // Reference to other Product documents

@@ -24,7 +24,36 @@ module.exports = {
   deleteSubCategory: deleteSubCategory,
   getSubCategoryOnCategory: getSubCategoryOnCategory,
   getFilterProducts: getFilterProducts,
+  getLatestProducts: getLatestProducts,
 };
+
+function getLatestProducts(req, res) {
+  async function getLatestProducts() {
+    try {
+      let latestProducts = await products
+        .find({ isActive: true })
+        .sort({ createdAt: -1 })
+        .limit(10)
+        .toArray();
+      if (!latestProducts) {
+        res.json({
+          message: "Failed to fetch products",
+          status: 400,
+          data: null,
+        });
+      } else {
+        res.json({
+          message: "Products fetched successfully",
+          status: 200,
+          data: latestProducts,
+        });
+      }
+    } catch (error) {
+      res.json({ data: error, status: 500 });
+    }
+  }
+  getLatestProducts().then(function () {});
+}
 
 function getFilterProducts(req, res) {
   async function getFilterProducts() {
@@ -361,6 +390,7 @@ function addProduct(req, res) {
         variants: req.body.variants || [],
         crossprice: req.body.crossprice || 0,
         price: req.body.price,
+        sku: req.body.sku | "",
         discount: req.body.discount || 0,
         stock: req.body.stock || 0,
         images: req.body.images || [],
