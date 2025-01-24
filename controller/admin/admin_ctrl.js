@@ -21,16 +21,38 @@ module.exports = {
   addBrand: addBrand,
   getBrands: getBrands,
   deleteCategory: deleteCategory,
-  deleteSubCategory:deleteSubCategory,
-  getSubCategoryOnCategory:getSubCategoryOnCategory,
-  uploadImage:uploadImage,
+  deleteSubCategory: deleteSubCategory,
+  getSubCategoryOnCategory: getSubCategoryOnCategory,
+  getFilterProducts: getFilterProducts,
 };
 
-function uploadImage(){
-    async function uploadImage(){
-
+function getFilterProducts(req, res) {
+  async function getFilterProducts() {
+    try {
+      let condition = {
+        isActive: true,
+        category: req.body.category,
+        subcategory: req.body.subcategory,
+      };
+      let response = await common.findAll(products, condition);
+      if (!response) {
+        res.json({
+          message: "Failed to fetch products",
+          status: 400,
+          data: null,
+        });
+      } else {
+        res.json({
+          message: "Products fetched successfully",
+          status: 200,
+          data: response,
+        });
+      }
+    } catch (error) {
+      res.json({ data: error, status: 500 });
     }
-    uploadImage().then(function(){})
+  }
+  getFilterProducts().then(function () {});
 }
 
 function addBrand(req, res) {
@@ -90,7 +112,7 @@ function addCategory(req, res) {
         res.json({ message: "Failed to add the category", status: 400 });
       } else {
         res.json({
-          data: saveCategoryData, 
+          data: saveCategoryData,
           status: 200,
           message: "Category Added",
         });
@@ -107,11 +129,15 @@ function deleteCategory(req, res) {
     try {
       if (req.body) {
         let ID = req.body.id;
-        let condition = { _id:ID };
+        let condition = { _id: ID };
         let data = {
           isActive: false,
         };
-        let categoryData = await common.findOneAndUpdate(category, condition, data);
+        let categoryData = await common.findOneAndUpdate(
+          category,
+          condition,
+          data
+        );
         if (!categoryData) {
           res.json({ message: "Failed to delete", status: 400 });
         } else {
@@ -129,31 +155,35 @@ function deleteCategory(req, res) {
   deleteCategory().then(function () {});
 }
 function deleteSubCategory(req, res) {
-    async function deleteSubCategory() {
-      try {
-        if (req.body) {
-          let ID = req.body.id;
-          let condition = { _id:ID };
-          let data = {
-            isActive: false,
-          };
-          let categoryData = await common.findOneAndUpdate(subcategory, condition, data);
-          if (!categoryData) {
-            res.json({ message: "Failed to delete", status: 400 });
-          } else {
-            res.json({
-              status: 200,
-              message: "Sub Category Deleted Successfully",
-              data: categoryData,
-            });
-          }
+  async function deleteSubCategory() {
+    try {
+      if (req.body) {
+        let ID = req.body.id;
+        let condition = { _id: ID };
+        let data = {
+          isActive: false,
+        };
+        let categoryData = await common.findOneAndUpdate(
+          subcategory,
+          condition,
+          data
+        );
+        if (!categoryData) {
+          res.json({ message: "Failed to delete", status: 400 });
+        } else {
+          res.json({
+            status: 200,
+            message: "Sub Category Deleted Successfully",
+            data: categoryData,
+          });
         }
-      } catch (error) {
-        res.json({ data: error, status: 500 });
       }
+    } catch (error) {
+      res.json({ data: error, status: 500 });
     }
-    deleteSubCategory().then(function () {});
   }
+  deleteSubCategory().then(function () {});
+}
 
 function getCategories(req, res) {
   async function getCategories() {
@@ -249,7 +279,11 @@ function addsubcategory(req, res) {
       if (!savesubcategoryData) {
         res.json({ message: "Failed to add the subcategory", status: 400 });
       } else {
-        res.json({ data: savesubcategoryData, status: 200, message:"Added Subcategory" });
+        res.json({
+          data: savesubcategoryData,
+          status: 200,
+          message: "Added Subcategory",
+        });
       }
     } catch (error) {
       res.json({ data: error, status: 500 });
@@ -261,13 +295,16 @@ function addsubcategory(req, res) {
 function getProducts(req, res) {
   async function getProducts() {
     try {
-      if (req.body) { 
-        let productsData = await common.findAll(products,{});
-        if(!productsData){
-            res.json({message:'No Products ',status:400})
-        }
-        else{
-            res.json({message:"Products fetched Successfully",data:productsData,status:200})
+      if (req.body) {
+        let productsData = await common.findAll(products, { isActive: true });
+        if (!productsData) {
+          res.json({ message: "No Products ", status: 400 });
+        } else {
+          res.json({
+            message: "Products fetched Successfully",
+            data: productsData,
+            status: 200,
+          });
         }
       }
     } catch (error) {
@@ -277,38 +314,39 @@ function getProducts(req, res) {
   getProducts().then(function () {});
 }
 
-function getSubCategoryOnCategory(req,res){
-    async function getSubCategoryOnCategory(){
-        try {
-            if(req.body && req.body.category){
-                let condition = {name:req.body.category}
-                let categories = await common.findOne(category,condition);
-                if(!categories){
-                    res.json({message:'No Category Found', status:400})
-                }
-                else{
-                    let ID = categories[0]._id;
-                    let conditionT = {parentCategory:ID,isActive:true}
-                    let subCategoriesData =  await common.findAll(subcategory,conditionT);
-                    if(!subCategoriesData){
-                        res.json({message:"No Sub Categories Fetched",status:400})
-                    }
-                    else{
-                        res.json({message:"Sub Categories Fetched",status:200,data:subCategoriesData})
-                    }
-                }
-            }
-            
-        } catch (error) {
-            res.json({ message: error, status: 500 });
+function getSubCategoryOnCategory(req, res) {
+  async function getSubCategoryOnCategory() {
+    try {
+      if (req.body && req.body.category) {
+        let condition = { name: req.body.category };
+        let categories = await common.findOne(category, condition);
+        if (!categories) {
+          res.json({ message: "No Category Found", status: 400 });
+        } else {
+          let ID = categories[0]._id;
+          let conditionT = { parentCategory: ID, isActive: true };
+          let subCategoriesData = await common.findAll(subcategory, conditionT);
+          if (!subCategoriesData) {
+            res.json({ message: "No Sub Categories Fetched", status: 400 });
+          } else {
+            res.json({
+              message: "Sub Categories Fetched",
+              status: 200,
+              data: subCategoriesData,
+            });
+          }
         }
+      }
+    } catch (error) {
+      res.json({ message: error, status: 500 });
     }
-    getSubCategoryOnCategory().then(function(){})
+  }
+  getSubCategoryOnCategory().then(function () {});
 }
 
 function addProduct(req, res) {
   async function addProduct() {
-    try { 
+    try {
       if (!req.body.name || !req.body.price || !req.body.category) {
         res.json({ message: "Required fileds are missing", status: 400 });
       }
@@ -321,12 +359,12 @@ function addProduct(req, res) {
         size: req.body.size || [],
         color: req.body.color || [],
         variants: req.body.variants || [],
-        crossprice:req.body.crossprice || 0 ,
+        crossprice: req.body.crossprice || 0,
         price: req.body.price,
         discount: req.body.discount || 0,
         stock: req.body.stock || 0,
         images: req.body.images || [],
-        reviews:[],
+        reviews: [],
         ratings: {
           average: req.body.ratings?.average || 0,
           count: req.body.ratings?.count || 0,
@@ -357,28 +395,32 @@ function addProduct(req, res) {
 function deleteProduct(req, res) {}
 
 function getProduct(req, res) {
-    async function getProduct(){
-      try {
-        if (req.body && req.body.id) {
-          let condition = { _id: req.body.id };
-          let productData = await common.findOne(products,{
-            _id:req.body.id
-          });  
-          if (!productData) {
-            return res.status(404).json({ message: "No product found", status: 400, data: null });
-          }  
-          return res.status(200).json({ message: "Product Fetched", status: 200, data: productData });
-        } else {
-          return res.status(400).json({ message: "Invalid request body", status: 400 });
+  async function getProduct() {
+    try {
+      if (req.body && req.body.id) {
+        let condition = { _id: req.body.id };
+        let productData = await common.findOne(products, {
+          _id: req.body.id,
+        });
+        if (!productData) {
+          return res
+            .status(404)
+            .json({ message: "No product found", status: 400, data: null });
         }
-      } catch (error) {
-        if (!res.headersSent) {
-          return res.status(500).json({ message: error.message, status: 500 });
-        }
-        console.error("Error after response was sent:", error);
+        return res
+          .status(200)
+          .json({ message: "Product Fetched", status: 200, data: productData });
+      } else {
+        return res
+          .status(400)
+          .json({ message: "Invalid request body", status: 400 });
       }
-
+    } catch (error) {
+      if (!res.headersSent) {
+        return res.status(500).json({ message: error.message, status: 500 });
+      }
+      console.error("Error after response was sent:", error);
     }
-    getProduct().then(function(){})
-
+  }
+  getProduct().then(function () {});
 }

@@ -13,6 +13,6 @@ module.exports = function (router) {
   router.put('/deletecategory',admin.deleteCategory);
   router.put('/deletesubcategory',admin.deleteSubCategory);
   router.post('/getsubcategories',admin.getSubCategoryOnCategory);
-  router.post('/upload',admin.uploadImage)
+  router.post('/getproducts',admin.getFilterProducts)
   return router;
 };
