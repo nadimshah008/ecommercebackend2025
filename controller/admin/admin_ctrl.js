@@ -28,13 +28,15 @@ module.exports = {
 };
 
 function getLatestProducts(req, res) {
+  console.log("Ssssssssssssss");
   async function getLatestProducts() {
     try {
-      let latestProducts = await products
-        .find({ isActive: true })
-        .sort({ createdAt: -1 })
-        .limit(10)
-        .toArray();
+      let latestProducts = await products.find({isActive:true})
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .exec();
+        
+        console.log("latestProducts",latestProducts);
       if (!latestProducts) {
         res.json({
           message: "Failed to fetch products",
@@ -49,6 +51,7 @@ function getLatestProducts(req, res) {
         });
       }
     } catch (error) {
+      console.log(error)
       res.json({ data: error, status: 500 });
     }
   }

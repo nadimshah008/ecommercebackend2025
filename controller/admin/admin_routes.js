@@ -14,6 +14,6 @@ module.exports = function (router) {
   router.put('/deletesubcategory',admin.deleteSubCategory);
   router.post('/getsubcategories',admin.getSubCategoryOnCategory);
   router.post('/getproducts',admin.getFilterProducts);
-  router.post('/getlatestproducts',admin.getLatestProducts);
+  router.get('/getlatestproducts',admin.getLatestProducts);
   return router;
 };
