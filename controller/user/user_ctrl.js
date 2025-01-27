@@ -5,15 +5,97 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
 const jwt = require('jsonwebtoken');
-
+const nodemailer = require("nodemailer");
+const store={email:""};
+const transporter = nodemailer.createTransport({
+  service: "gmail", // Use your email provider (e.g., Gmail)
+  auth: {
+    user: "nadim.shah.official@gmail.com", // Set in .env file
+    pass:"rqtm mwgm kmma hzni", // Set in .env file
+  },
+});
+function generateOtp() {
+  return Math.floor(Math.random()*999999);
+}
 module.exports = {
   getUser: getUser,
   addUser: addUser,
   updateUser: updateUser,
   loginUser: loginUser,
   addAdmin:addAdmin,
-  loginAdmin:loginAdmin
+  loginAdmin:loginAdmin,
+  sendOtp:sendOtp,
+  verifyOtp:verifyOtp
 };
+
+function verifyOtp(req,res){
+  async function verifyOtp() {
+    try {
+      console.log(req.body);
+  
+      if (!req.body.email || !req.body.otp) {
+        return res.json({ message: "Email and OTP are required", status: 400 });
+      }
+  
+      const otpData = store["email"]; 
+  
+      if (!otpData.otp) {
+        return res.json({ message: "OTP is expired", status: 400 });
+      }
+  
+      const isOTPValid = otpData.otp === req.body.otp;
+      const isOtpExpired = Date.now() - store.createdAt > 5 * 60 * 1000;
+  
+      if (isOtpExpired) {
+        delete store["email"]; 
+        return res.status(400).json({ message: "OTP expired" });
+      }
+  
+      if (!isOTPValid) {
+        return res.status(400).json({ message: "Invalid OTP" });
+      }
+  
+      delete store[req.body.email];
+      return res.json({ message: "OTP verified successfully", status: 200 });
+  
+    } catch (error) {
+      return res.status(500).json({ message: error.message, status: 500 });
+    }
+  }
+verifyOtp().then(function(){})
+}
+
+function sendOtp(req,res){
+  async function sendOtp(){
+    if(!req.body.email){
+      res.json({message:"Email is requried", status:400})
+    }
+    let otp =await generateOtp();
+    store["email"]={otp,createdAt: Date.now()}
+    try {
+     await transporter.sendMail({
+      from:process.env.EMAIL,
+      to:req.body.email,
+      Subject:"Unixy OTP Code",
+      html: `
+      <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px; background-color: #f7f7f7;">
+        <div style="max-width: 500px; margin: auto; background: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+          <h1 style="color: #333;">Your OTP Code</h1>
+          <p style="font-size: 16px; color: #555;">Use the code below to verify your email address. This code is valid for 5 minutes.</p>
+          <div style="margin: 20px 0; font-size: 24px; font-weight: bold; color:rgb(207, 245, 37);">${otp}</div>
+          <p style="font-size: 14px; color: #888;">If you didn’t request this, you can safely ignore this email.</p>
+        </div>
+      </div>
+    `,
+     })
+     res.json({message:"OTP send successfully", status:200,otp:otp});
+    } catch (error) {
+      res.json({ message: error,status:500 });
+    }
+  }
+  sendOtp().then(function(){})
+}
+
 
 
 function addAdmin(req,res){
@@ -48,6 +130,7 @@ function loginUser(req, res) {
   async function loginUser() { 
     try {
       if (req.body && req.body.email) {
+
         let condition = { email: req.body.email };
         let fetchUser = await common.findOne(users, condition);
         if (!fetchUser.length) {

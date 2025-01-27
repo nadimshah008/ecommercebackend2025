@@ -28,7 +28,6 @@ module.exports = {
 };
 
 function getLatestProducts(req, res) {
-  console.log("Ssssssssssssss");
   async function getLatestProducts() {
     try {
       let latestProducts = await products.find({isActive:true})

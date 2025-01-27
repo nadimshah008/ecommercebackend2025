@@ -6,5 +6,7 @@ module.exports = function (router) {
   router.post('/login',user.loginUser)
   router.post('/registeradmin', user.addAdmin);
   router.post('/loginadmin',user.loginAdmin);
+  router.post('/send-otp',user.sendOtp);
+  router.post('/verify-otp',user.verifyOtp);
   return router;
 };
