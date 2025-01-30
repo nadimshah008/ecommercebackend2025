@@ -35,7 +35,6 @@ function getLatestProducts(req, res) {
       .limit(10)
       .exec();
         
-        console.log("latestProducts",latestProducts);
       if (!latestProducts) {
         res.json({
           message: "Failed to fetch products",

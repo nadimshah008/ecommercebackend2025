@@ -5,6 +5,14 @@ var userSchema = mongoose.Schema(
       type: String,
       default: null,
     },
+    resetkey:{
+      type:String,
+      default:null
+    },
+    uuid:{
+      type:String,
+      default:null
+    },
     email: {
       type: String,
       unique: true,

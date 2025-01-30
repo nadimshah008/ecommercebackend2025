@@ -8,5 +8,7 @@ module.exports = function (router) {
   router.post('/loginadmin',user.loginAdmin);
   router.post('/send-otp',user.sendOtp);
   router.post('/verify-otp',user.verifyOtp);
+  router.post('/forgot-password',user.forgotPassword);
+  router.post('/change-password',user.changePassword);
   return router;
 };
